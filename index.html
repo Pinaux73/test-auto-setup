@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Auto - Guida Interattiva</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 p-6">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">🔧 Setup Auto - Guida Interattiva</h1>
+
+    <div id="flow" class="space-y-4"></div>
+
+    <div class="flex gap-3 mt-6">
+      <button onclick="renderStep('start')" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700">🏠 Torna alla Home</button>
+      <button onclick="exportPDF()" class="px-4 py-2 rounded bg-green-600 hover:bg-green-700">📄 Esporta in PDF</button>
+    </div>
+  </div>
+
+  <script>
+    const steps = { /* steps object omitted for brevity */ };
+    const flow = document.getElementById('flow');
+
+    function renderStep(stepName) {
+      const step = steps[stepName];
+      flow.innerHTML = '';
+      const div = document.createElement('div');
+      div.className = 'bg-gray-800 rounded p-4 whitespace-pre-wrap';
+      div.textContent = step.text;
+      flow.appendChild(div);
+      if (step.options) {
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.className = 'mt-3 flex flex-wrap gap-2';
+        step.options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.textContent = opt.text;
+          btn.className = 'px-3 py-1 rounded bg-blue-600 hover:bg-blue-700';
+          btn.onclick = () => renderStep(opt.next);
+          buttonsDiv.appendChild(btn);
+        });
+        flow.appendChild(buttonsDiv);
+      }
+    }
+
+    function exportPDF() {
+      const opt = {
+        margin: 0.5,
+        filename: 'setup-auto.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().from(flow).set(opt).save();
+    }
+
+    renderStep('start');
+  </script>
+</body>
+</html>
