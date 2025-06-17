@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -8,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body class="bg-gray-900 text-gray-100 p-6">
+<body class="bg-gray-900 text-green-400 p-6">
   <div class="max-w-2xl mx-auto">
     <h1 class="text-3xl font-bold mb-6 text-center">🔧 Setup Auto - Guida Interattiva</h1>
 
@@ -21,26 +20,107 @@
   </div>
 
   <script>
-    const steps = { /* steps object omitted for brevity */ };
+    const steps = {
+      start: {
+        text: "Benvenuto! Cosa vuoi correggere nel setup dell'auto?",
+        options: [
+          { text: "Comportamento in curva", next: "curva" },
+          { text: "Problemi in rettilineo", next: "rettilineo" },
+          { text: "Problemi in frenata", next: "frenata" },
+          { text: "Consumo gomme", next: "consumo" },
+          { text: "Temperature gomme", next: "temperature" }
+        ]
+      },
+      curva: {
+        text: "Dove avverti il problema in curva?",
+        options: [
+          { text: "Ingresso curva", next: "ingresso" },
+          { text: "Centro curva", next: "centro" },
+          { text: "Uscita curva", next: "uscita" }
+        ]
+      },
+      ingresso: {
+        text: "Che tipo di problema hai in ingresso curva?",
+        options: [
+          { text: "Sottosterzo", next: "ingressoSottosterzo" },
+          { text: "Sovrasterzo", next: "ingressoSovrasterzo" }
+        ]
+      },
+      ingressoSottosterzo: { text: "Modifiche consigliate:\n• Riduci freno motore\n• Allenta barra antirollio anteriore\n• Sposta bilanciamento freni avanti\n• Ammorbidisci sospensioni anteriori" },
+      ingressoSovrasterzo: { text: "Modifiche consigliate:\n• Aumenta freno motore\n• Indurisci barra antirollio posteriore\n• Sposta bilanciamento freni indietro" },
+      centro: {
+        text: "Che tipo di problema hai al centro curva?",
+        options: [
+          { text: "Sottosterzo", next: "centroSottosterzo" },
+          { text: "Sovrasterzo", next: "centroSovrasterzo" }
+        ]
+      },
+      centroSottosterzo: { text: "Modifiche consigliate:\n• Aumenta camber negativo anteriore\n• Allenta barra antirollio anteriore\n• Riduci pressione gomme anteriori\n• Aumenta carico aerodinamico anteriore" },
+      centroSovrasterzo: { text: "Modifiche consigliate:\n• Riduci camber negativo posteriore\n• Allenta barra antirollio posteriore\n• Aumenta pressione gomme posteriori\n• Aumenta carico aerodinamico posteriore" },
+      uscita: {
+        text: "Che tipo di problema hai in uscita curva?",
+        options: [
+          { text: "Sottosterzo", next: "uscitaSottosterzo" },
+          { text: "Sovrasterzo", next: "uscitaSovrasterzo" }
+        ]
+      },
+      uscitaSottosterzo: { text: "Modifiche consigliate:\n• Allenta differenziale in trazione\n• Ammorbidisci sospensioni posteriori" },
+      uscitaSovrasterzo: { text: "Modifiche consigliate:\n• Indurisci differenziale in trazione\n• Indurisci sospensioni posteriori\n• Riduci barra antirollio posteriore" },
+      rettilineo: {
+        text: "Problema in rettilineo:",
+        options: [
+          { text: "Instabilità/oscilla", next: "rettInstabile" },
+          { text: "Pigra nei cambi di direzione", next: "rettPigra" }
+        ]
+      },
+      rettInstabile: { text: "Modifiche consigliate:\n• Aumenta carico aerodinamico posteriore\n• Riduci incidenza ala anteriore\n• Indurisci sospensioni posteriori\n• Aumenta convergenza posteriore" },
+      rettPigra: { text: "Modifiche consigliate:\n• Aumenta convergenza anteriore\n• Indurisci barra antirollio anteriore" },
+      frenata: {
+        text: "Qual è il problema in frenata?",
+        options: [
+          { text: "Blocco ruote anteriori", next: "frenoAnteriore" },
+          { text: "Blocco ruote posteriori", next: "frenoPosteriore" }
+        ]
+      },
+      frenoAnteriore: { text: "Modifiche consigliate:\n• Sposta bilanciamento freni indietro\n• Riduci pressione gomme anteriori\n• Riduci freno motore" },
+      frenoPosteriore: { text: "Modifiche consigliate:\n• Sposta bilanciamento freni avanti\n• Aumenta freno motore\n• Indurisci sospensioni posteriori" },
+      consumo: {
+        text: "Quali gomme si consumano di più?",
+        options: [
+          { text: "Anteriore", next: "consumoAnt" },
+          { text: "Posteriore", next: "consumoPost" }
+        ]
+      },
+      consumoAnt: { text: "Modifiche consigliate:\n• Controlla camber anteriore\n• Riduci pressione anteriore\n• Migliora bilanciamento per ridurre sottosterzo" },
+      consumoPost: { text: "Modifiche consigliate:\n• Controlla camber posteriore\n• Riduci pressione posteriore\n• Migliora bilanciamento per ridurre sovrasterzo" },
+      temperature: {
+        text: "Distribuzione temperature gomme:\n• Interno più caldo → Troppo camber negativo\n• Esterno più caldo → Poco camber\n• Centro più caldo → Pressione troppo alta\n• Bordi più caldi → Pressione troppo bassa"
+      }
+    };
+
     const flow = document.getElementById('flow');
 
     function renderStep(stepName) {
       const step = steps[stepName];
       flow.innerHTML = '';
+
       const div = document.createElement('div');
       div.className = 'bg-gray-800 rounded p-4 whitespace-pre-wrap';
       div.textContent = step.text;
       flow.appendChild(div);
+
       if (step.options) {
         const buttonsDiv = document.createElement('div');
         buttonsDiv.className = 'mt-3 flex flex-wrap gap-2';
+
         step.options.forEach(opt => {
           const btn = document.createElement('button');
           btn.textContent = opt.text;
-          btn.className = 'px-3 py-1 rounded bg-blue-600 hover:bg-blue-700';
+          btn.className = 'px-3 py-1 rounded bg-green-600 hover:bg-green-700';
           btn.onclick = () => renderStep(opt.next);
           buttonsDiv.appendChild(btn);
         });
+
         flow.appendChild(buttonsDiv);
       }
     }
